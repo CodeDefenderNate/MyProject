@@ -6,24 +6,24 @@ import time
 def showInstructions():
     """Show the game instructions when called"""
     #print a main menu and the commands
-    print('''
-    Garion the Sorcerer
-    ========
+    print(crayons.green("""
+    Garion the Sorcerer"""))
+    print(crayons.yellow("""===========================
     Commands:
       go [direction]
       get [item]
-    ''')
+    """))
 
 def showStatus():
     """determine the current status of the player"""
     # print the player's current location
     print('---------------------------')
-    print('You are in the ' + currentRoom)
+    print('You are in the ' + crayons.magenta([currentRoom]))
     # print what the player is carrying
-    print('Inventory:', inventory)
+    print(crayons.blue('Inventory:'), crayons.green(inventory))
     # check if there's an item in the room, if so print it
     if "item" in rooms[currentRoom]:
-      print('There is a ' + rooms[currentRoom]['item'])
+      print('There is a ' + crayons.green(rooms[currentRoom]['item']))
     print("---------------------------")
 
 
@@ -149,7 +149,7 @@ while True:
             currentRoom = rooms[currentRoom][move[1]]
         # if they aren't allowed to go that way:
         else:
-            print('You can\'t go that way!')
+            print(crayons.red('You can\'t go that way!'))
 
     #if they type 'get' first
     if move[0] == 'get' :
@@ -160,31 +160,31 @@ while True:
             #add the item to their inventory
             inventory.append(rooms[currentRoom]['item'])
             #display a helpful message
-            print(rooms[currentRoom]['item'] + ' aquired!')
+            print(crayons.green(rooms[currentRoom]['item']) + ' aquired!')
             #delete the item key:value pair from the room's dictionary
             del rooms[currentRoom]['item']
         # if there's no item in the room or the item doesn't match
         else:
             #tell them they can't get it
-            print('Can\'t get ' + move[1] + '!')
+            print(crayons.red('Can\'t get ' + move[1] + '!'))
 
         ## If a player enters a room with a monster
         ## Define how a player can win
 
     if currentRoom == 'Courtyard' and 'Key' in inventory and 'Health Potion x3' in inventory and 'Mage Staff' in inventory and 'Spell Scroll: Maelstrom' in inventory:
-        print('The Red Dragon uses its Fire Breath on you!')
+        print(f'The {crayons.red('Red Dragon')} uses its Fire Breath on you!')
         time.sleep(1)
         print('You used a Health Potion!')
         time.sleep(1)
         print('Maelstrom cast!')
         time.sleep(1)
-        print('The fabled Red Dragon has finally been defeated... balance has been restored\nGAME OVER!')
+        print(f'The fabled {crayons.red('Red Dragon')} has finally been defeated... balance has been restored!\nGAME OVER!')
         break
 
     
         ## If a player enters a room with a monster
     elif 'item' in rooms[currentRoom] and 'Red Dragon' in rooms[currentRoom]['item']:
-        print('A Red Dragon has used its Fire Breath on you!...')
+        print(f'The {crayons.red('Red Dragon')} has used its Fire Breath on you!...')
         time.sleep(1)
         print('GAME OVER!')
         break
