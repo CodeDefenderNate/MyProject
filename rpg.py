@@ -74,7 +74,7 @@ rooms = {
             
             'East Wing' : {
                   'north' : 'Northeast Intersection',
-                  'south' : 'Southeast Interseciton',
+                  'south' : 'Southeast Intersection',
                   'west' : 'Great Hall'
                 },
 
@@ -156,11 +156,11 @@ while True:
         # make two checks:
         # 1. if the current room contains an item
         # 2. if the item in the room matches the item the player wishes to get
-        if "item" in rooms[currentRoom] and move[1] in rooms[currentRoom]['item']:
+        if "item" in rooms[currentRoom] and rooms[currentRoom]['item'].lower() == move[1]:
             #add the item to their inventory
-            inventory.append(move[1])
+            inventory.append(rooms[currentRoom]['item'])
             #display a helpful message
-            print(move[1] + ' aquired!')
+            print(rooms[currentRoom]['item'] + ' aquired!')
             #delete the item key:value pair from the room's dictionary
             del rooms[currentRoom]['item']
         # if there's no item in the room or the item doesn't match
@@ -169,18 +169,10 @@ while True:
             print('Can\'t get ' + move[1] + '!')
 
         ## If a player enters a room with a monster
-    
         ## Define how a player can win
-    
-        ## If a player enters a room with a monster
-    if 'item' in rooms[currentRoom] and 'Red Dragon' in rooms[currentRoom]['item']:
-        print('A Red Dragon has used it\'s Fire Breath on you!...')
-        time.sleep(1)
-        print('GAME OVER!')
-        break
-    
-    if currentRoom == 'Courtyard' and 'key' in inventory and 'Health Potion x3' in inventory and 'Mage Staff' in inventory and 'Spell Scroll: Maelstrom' in inventory:
-        print('The Red Dragon uses it\s Fire Breath on you!')
+
+    if currentRoom == 'Courtyard' and 'Key' in inventory and 'Health Potion x3' in inventory and 'Mage Staff' in inventory and 'Spell Scroll: Maelstrom' in inventory:
+        print('The Red Dragon uses its Fire Breath on you!')
         time.sleep(1)
         print('You used a Health Potion!')
         time.sleep(1)
@@ -188,6 +180,11 @@ while True:
         time.sleep(1)
         print('The fabled Red Dragon has finally been defeated... balance has been restored\nGAME OVER!')
         break
-        
 
-
+    
+        ## If a player enters a room with a monster
+    elif 'item' in rooms[currentRoom] and 'Red Dragon' in rooms[currentRoom]['item']:
+        print('A Red Dragon has used its Fire Breath on you!...')
+        time.sleep(1)
+        print('GAME OVER!')
+        break
