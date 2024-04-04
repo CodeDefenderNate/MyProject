@@ -1,29 +1,32 @@
 #!/usr/bin/python3
-"""Garion the Sorcerer RPG game | Nathan Haley"""
+"""Garion: The Child of Light - RPG game | Nathan Haley"""
 import crayons
 import time
+
+player_health = 100 # Starting health for the player
+dragon_health = 1000 # Starting health for the dragon
 
 def showInstructions():
     """Show the game instructions when called"""
     #print a main menu and the commands
     print(crayons.green("""
-    Garion the Sorcerer"""))
-    print(crayons.yellow("""===========================
+    Garion: The Child of Light""", bold=True))
+    print(crayons.yellow("""==================================
     Commands:
       go [direction]
       get [item]
-    """))
+    """, bold=True))
 
 def showStatus():
     """determine the current status of the player"""
-    # print the player's current location
-    print('---------------------------')
-    print('You are in the ' + crayons.magenta([currentRoom]))
+    # print the player"s current location
+    print("---------------------------")
+    print("You are in the " + crayons.magenta([currentRoom], bold=True))
     # print what the player is carrying
-    print(crayons.blue('Inventory:'), crayons.green(inventory))
-    # check if there's an item in the room, if so print it
+    print(crayons.blue("Inventory:", bold=True), crayons.green(inventory, bold=True))
+    # check if there"s an item in the room, if so print it
     if "item" in rooms[currentRoom]:
-      print('There is a ' + crayons.green(rooms[currentRoom]['item']))
+      print("There is a " + crayons.green(rooms[currentRoom]["item"], bold=True))
     print("---------------------------")
 
 
@@ -33,96 +36,96 @@ inventory = []
 # a dictionary linking a room to other rooms
 rooms = {
 
-            'Great Hall' : {
-                  'north' : 'North Wing',
-                  'south' : 'South Wing',
-                  'east' : 'East Wing',
-                  'west' : 'West Wing'
+            "Great Hall" : {
+                  "north" : "North Wing",
+                  "south" : "South Wing",
+                  "east" : "East Wing",
+                  "west" : "West Wing"
                 },
 
-            'Courtyard' : {
-                  'south' : 'North Wing',
-                  'east' : 'Library',
-                  'west' : 'Kitchen',
-                  'item' : 'Red Dragon'
+            "Courtyard" : {
+                  "south" : "North Wing",
+                  "east" : "Library",
+                  "west" : "Kitchen",
+                  "item" : "Red Dragon"
                 },
 
-            'Kitchen' : {
-                  'south' : 'Northwest Intersection',
-                  'east' : 'Courtyard',
-                  'item' : 'Health Potion x3'
+            "Kitchen" : {
+                  "south" : "Northwest Intersection",
+                  "east" : "Courtyard",
+                  "item" : "Health Potion x3"
                 },
 
-            'Library' : {
-                  'south' : 'Northeast Intersection',
-                  'west' : 'Courtyard',
-                  'item' : 'Spell Scroll: Maelstrom'
+            "Library" : {
+                  "south" : "Northeast Intersection",
+                  "west" : "Courtyard",
+                  "item" : "Spell Scroll: Maelstrom"
                 },
 
-            'North Wing' : {
-                  'north' : 'Courtyard',
-                  'east' : 'Northeast Intersection',
-                  'west' : 'Northwest Intersection',
-                  'south' : 'Great Hall'
+            "North Wing" : {
+                  "north" : "Courtyard",
+                  "east" : "Northeast Intersection",
+                  "west" : "Northwest Intersection",
+                  "south" : "Great Hall"
                 },
 
-            'South Wing' : {
-                  'north' : 'Great Hall',
-                  'east' : 'Southeast Intersection',
-                  'west' : 'Southwest Intersection'
+            "South Wing" : {
+                  "north" : "Great Hall",
+                  "east" : "Southeast Intersection",
+                  "west" : "Southwest Intersection"
                 },
             
-            'East Wing' : {
-                  'north' : 'Northeast Intersection',
-                  'south' : 'Southeast Intersection',
-                  'west' : 'Great Hall'
+            "East Wing" : {
+                  "north" : "Northeast Intersection",
+                  "south" : "Southeast Intersection",
+                  "west" : "Great Hall"
                 },
 
-            'West Wing' : {
-                  'north' : 'Northwest Intersection',
-                  'south' : 'Southwest Intersection',
-                  'east' : 'Great Hall'
+            "West Wing" : {
+                  "north" : "Northwest Intersection",
+                  "south" : "Southwest Intersection",
+                  "east" : "Great Hall"
                 },
             
-            'Northwest Intersection' : {
-                  'north' : 'Kitchen',
-                  'south' : 'West Wing',
-                  'east' : 'North Wing'
+            "Northwest Intersection" : {
+                  "north" : "Kitchen",
+                  "south" : "West Wing",
+                  "east" : "North Wing"
                 },
             
-            'Northeast Intersection' : {
-                  'north' : 'Library',
-                  'south' : 'East Wing',
-                  'west' : 'North Wing'
+            "Northeast Intersection" : {
+                  "north" : "Library",
+                  "south" : "East Wing",
+                  "west" : "North Wing"
                 },
             
-            'Southeast Intersection' : {
-                  'north' : 'East Wing',
-                  'east' : 'SE Guard Tower',
-                  'west' : 'South Wing'
+            "Southeast Intersection" : {
+                  "north" : "East Wing",
+                  "east" : "SE Guard Tower",
+                  "west" : "South Wing"
                 },
 
-            'Southwest Intersection' : {
-                  'north' : 'West Wing',
-                  'east' : 'South Wing',
-                  'west' : 'SW Guard Tower'
+            "Southwest Intersection" : {
+                  "north" : "West Wing",
+                  "east" : "South Wing",
+                  "west" : "SW Guard Tower"
                 },
 
-            'SW Guard Tower' : {
-                  'east' : 'Southwest Intersection',
-                  'item' : 'Key'
+            "SW Guard Tower" : {
+                  "east" : "Southwest Intersection",
+                  "item" : "Key"
                 },
 
-            'SE Guard Tower' : {
-                  'west' : 'Southeast Intersection',
-                  'item' : 'Mage Staff'
+            "SE Guard Tower" : {
+                  "west" : "Southeast Intersection",
+                  "item" : "Mage Staff"
             }
 
 
          }
 
 # start the player in the Hall
-currentRoom = 'Great Hall'
+currentRoom = "Great Hall"
 
 showInstructions()
 
@@ -132,59 +135,112 @@ while True:
 
     # the player MUST type something in
     # otherwise input will keep asking
-    move = ''
-    while move == '':  
-        move = input('>')
+    move = ""
+    while move == "":  
+        move = input(">")
 
     # normalizing input:
     # .lower() makes it lower case, .split() turns it to a list
     # therefore, "get golden key" becomes ["get", "golden key"]          
     move = move.lower().split(" ", 1)
 
-    #if they type 'go' first
-    if move[0] == 'go':
+    #if they type "go" first
+    if move[0] == "go":
         #check that they are allowed wherever they want to go
         if move[1] in rooms[currentRoom]:
             #set the current room to the new room
             currentRoom = rooms[currentRoom][move[1]]
-        # if they aren't allowed to go that way:
+        # if they aren"t allowed to go that way:
         else:
-            print(crayons.red('You can\'t go that way!'))
+            print(crayons.red("You can\"t go that way!", bold=True))
 
-    #if they type 'get' first
-    if move[0] == 'get' :
+    #if they type "get" first
+    if move[0] == "get" :
         # make two checks:
         # 1. if the current room contains an item
         # 2. if the item in the room matches the item the player wishes to get
-        if "item" in rooms[currentRoom] and rooms[currentRoom]['item'].lower() == move[1]:
+        if "item" in rooms[currentRoom] and rooms[currentRoom]["item"].lower() == move[1]:
             #add the item to their inventory
-            inventory.append(rooms[currentRoom]['item'])
+            inventory.append(rooms[currentRoom]["item"])
             #display a helpful message
-            print(crayons.green(rooms[currentRoom]['item']) + ' aquired!')
-            #delete the item key:value pair from the room's dictionary
-            del rooms[currentRoom]['item']
-        # if there's no item in the room or the item doesn't match
+            print(crayons.green(rooms[currentRoom]["item"], bold=True) + " aquired!")
+            #delete the item key:value pair from the room"s dictionary
+            del rooms[currentRoom]["item"]
+        # if there"s no item in the room or the item doesn"t match
         else:
-            #tell them they can't get it
-            print(crayons.red('Can\'t get ' + move[1] + '!'))
+            #tell them they can"t get it
+            print(crayons.red("Can\'t get " + move[1] + "!", bold=True))
 
         ## If a player enters a room with a monster
         ## Define how a player can win
 
-    if currentRoom == 'Courtyard' and 'Key' in inventory and 'Health Potion x3' in inventory and 'Mage Staff' in inventory and 'Spell Scroll: Maelstrom' in inventory:
-        print(f'The {crayons.red('Red Dragon')} uses its Fire Breath on you!')
-        time.sleep(1)
-        print('You used a Health Potion!')
-        time.sleep(1)
-        print('Maelstrom cast!')
-        time.sleep(1)
-        print(f'The fabled {crayons.red('Red Dragon')} has finally been defeated... balance has been restored!\nGAME OVER!')
-        break
+    if currentRoom == "Courtyard" and "Red Dragon" in rooms[currentRoom]["item"]:
+        in_combat = True
+        print(f"{crayons.yellow("You have encountered the", bold=True)} {crayons.red("Red Dragon", bold=True)}!")
 
-    
-        ## If a player enters a room with a monster
-    elif 'item' in rooms[currentRoom] and 'Red Dragon' in rooms[currentRoom]['item']:
-        print(f'The {crayons.red('Red Dragon')} has used its Fire Breath on you!...')
-        time.sleep(1)
-        print('GAME OVER!')
-        break
+        while in_combat:
+            print(f"Dragon Health {dragon_health}, Garion\"s Health {player_health}")
+            print(f"Do you want to (1) {crayons.red("Attack", bold=True)} or (2) use a {crayons.green("Health Potion?", bold=True)}")
+            action = input("> ").strip()
+        
+            if action == "1":
+                # Attack the dragon
+                if "Mage Staff" in inventory and "Spell Scroll: Maelstrom" in inventory:
+                    dragon_health -= 333 # Dragon loses a third of it"s health
+                    print(f"You use your {crayons.green("Mage Staff", bold=True)} and the {crayons.green("Spell Scroll: Maelstrom", bold=True)} against the {crayons.red("Red Dragon", bold=True)}...")
+                    time.sleep(1)
+                    print("Causing significant damage!")
+                    time.sleep(1)
+                    if dragon_health <= 0:
+                        print(f"{crayons.yellow("The", bold=True)} {crayons.red("Red Dragon", bold=True)} {crayons.yellow("has been defeated!", bold=True)}")
+                        time.sleep(1)
+                        print(crayons.blue("Peace and balance have finally been restored in the Kingdom...", bold=True))
+                        time.sleep(1)
+                        print(crayons.blue("Garion's tale to be continued...", bold=True))
+                        del rooms[currentRoom]["item"]
+                        in_combat = False
+                        exit()
+                    
+                elif "Mage Staff" not in inventory and "Spell Scroll: Maelstrom" not in inventory:
+                    print(f"{crayons.yellow("You do not posses the required magical items to defeat the", bold=True)} {crayons.red("Red Dragon", bold=True)}")
+                    time.sleep(1)
+                    print(crayons.yellow("Turn back!", bold=True))
+                    time.sleep(1)
+                    in_combat = False
+                    continue
+
+                # Dragon attacks back
+                player_health -= 50
+                print(f"The {crayons.red("Red Dragon", bold=True)} retaliates, hurling a {crayons.red("Fire Ball", bold=True)} causing severe damage to you!")
+                if player_health <= 0:
+                    print(f"The {crayons.red("Red Dragon", bold=True)} engulfs you in fire!")
+                    time.sleep(1)
+                    print(crayons.yellow("You have been defeated...", bold=True))
+                    time.sleep(1)
+                    print(crayons.red("Game Over!", bold=True))
+                    exit()
+
+            elif action == "2":
+                if "Health Potion x3" in inventory:
+                    player_health += 50 # Each potion restores 50 health
+                    print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring your health.")
+                    inventory.append("Health Potion x2")
+                    inventory.remove("Health Potion x3")
+                elif "Health Potion x2" in inventory:
+                    player_health += 50
+                    print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring your health.")
+                    inventory.append("Health Potion x1")
+                    inventory.remove("Health Potion x2")
+                elif "Health Potion x1" in inventory:
+                    player_health += 50
+                    print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring you health.")
+                    inventory.remove("Health Potion x1")
+                elif "Health Potion x3" not in inventory or "Health Potion x2" not in inventory or "Health Potion x1" not in inventory:
+                    print(f"{crayons.yellow("You don't have any", bold=True)} {crayons.green("Health Potions", bold=True)} {crayons.yellow("left!", bold=True)}")
+                    time.sleep(1)
+                    
+                    
+
+        # This check prevents the loop from immediatly prompting again without showing the outcome of the action
+        if in_combat:
+            print(f"{crayons.red("Red Dragon's")} health is now {dragon_health}. Your health is now {player_health}")
