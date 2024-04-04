@@ -15,6 +15,8 @@ def showInstructions():
     Commands:
       go [direction]
       get [item]
+      use [item]
+      teleport [room name]
     """, bold=True))
 
 def showStatus():
@@ -23,7 +25,7 @@ def showStatus():
     print("---------------------------")
     print("You are in the " + crayons.magenta([currentRoom], bold=True))
     # print what the player is carrying
-    print(crayons.blue("Inventory:", bold=True), crayons.green(inventory, bold=True))
+    print(crayons.blue("Inventory:", bold=True), crayons.green(str(inventory), bold=True))
     # check if there"s an item in the room, if so print it
     if "item" in rooms[currentRoom]:
       print("There is a " + crayons.green(rooms[currentRoom]["item"], bold=True))
@@ -43,7 +45,7 @@ rooms = {
                   "west" : "West Wing"
                 },
 
-            "Courtyard" : {
+            "Courtyard" : { # Changed to require a key
                   "south" : "North Wing",
                   "east" : "Library",
                   "west" : "Kitchen",
@@ -52,21 +54,21 @@ rooms = {
 
             "Kitchen" : {
                   "south" : "Northwest Intersection",
-                  "east" : "Courtyard",
-                  "item" : "Health Potion x3"
+                  "east" : "Courtyard", # Changed to require a key
+                  "item" : ["Health Potion x3"]
                 },
 
             "Library" : {
                   "south" : "Northeast Intersection",
-                  "west" : "Courtyard",
-                  "item" : "Spell Scroll: Maelstrom"
+                  "west" : "Courtyard", # Changed to require a key
+                  "item" : ["Spell Scroll: Maelstrom", "Spell Scroll: Meteor", "Spell Scroll: Lightning"]
                 },
 
             "North Wing" : {
-                  "north" : "Courtyard",
+                  "south" : "Great Hall", 
                   "east" : "Northeast Intersection",
-                  "west" : "Northwest Intersection",
-                  "south" : "Great Hall"
+                  "west" : "Northwest Intersection"
+                  
                 },
 
             "South Wing" : {
@@ -101,24 +103,24 @@ rooms = {
             
             "Southeast Intersection" : {
                   "north" : "East Wing",
-                  "east" : "SE Guard Tower",
+                  "east" : "Southeast Guard Tower",
                   "west" : "South Wing"
                 },
 
             "Southwest Intersection" : {
                   "north" : "West Wing",
                   "east" : "South Wing",
-                  "west" : "SW Guard Tower"
+                  "west" : "Southwest Guard Tower"
                 },
 
-            "SW Guard Tower" : {
+            "Southwest Guard Tower" : {
                   "east" : "Southwest Intersection",
-                  "item" : "Key"
+                  "item" : ["Key"]
                 },
 
-            "SE Guard Tower" : {
+            "Southeast Guard Tower" : {
                   "west" : "Southeast Intersection",
-                  "item" : "Mage Staff"
+                  "item" : ["Mage Staff"]
             }
 
 
@@ -132,44 +134,107 @@ showInstructions()
 # breaking this while loop means the game is over
 while True:
     showStatus()
-
+    move = input("> ").lower().split(" ", 1)
     # the player MUST type something in
     # otherwise input will keep asking
-    move = ""
-    while move == "":  
-        move = input(">")
+    ## move = ""
+    ## while move == "":  
+        ## move = input("> ").lower()
+    ## move = move.split(" ", 1)
 
     # normalizing input:
     # .lower() makes it lower case, .split() turns it to a list
     # therefore, "get golden key" becomes ["get", "golden key"]          
-    move = move.lower().split(" ", 1)
+    ## move = move.lower().split(" ", 1)
 
     #if they type "go" first
     if move[0] == "go":
-        #check that they are allowed wherever they want to go
-        if move[1] in rooms[currentRoom]:
-            #set the current room to the new room
-            currentRoom = rooms[currentRoom][move[1]]
-        # if they aren"t allowed to go that way:
+        direction = move[1]
+        if direction in rooms[currentRoom]:
+            if direction == "east" and currentRoom == "Kitchen" and "Key" not in inventory:
+                print(crayons.red("The door is locked. You need a Key to enter the Courtyard", bold=True))
+            elif direction == "west" and currentRoom == "Library" and "Key" not in inventory:
+                print(crayons.red("The door is locked. You need a Key to enter the Courtyard", bold=True))
+            else:
+                currentRoom = rooms[currentRoom][direction]
+                print("You go to the " + currentRoom + ".")
         else:
-            print(crayons.red("You can\"t go that way!", bold=True))
-
+            print(crayons.yellow("You can't go that way", bold=True))
+        # Check that they are allowed wherever they want to go
+        ## if move[1] in rooms[currentRoom]:
+            # Check if they have the key for Courtyard
+            ## if move[1] == "Courtyard" and "Key" not in inventory:
+               ## print(crayons.red("The door to the Courtyard is locked. You need a Key to enter.", bold=True))
+            ## else:
+               ## currentRoom = rooms[currentRoom][move[1]]
+        ## else:    
+           ## print(crayons.red("You can't go that way!", bold=True))
+    if move[0] == "teleport":
+        if len(move) > 1:
+            targetRoom = " ".join([word.capitalize() for word in move[1].split()])
+            if targetRoom.lower() in (room.lower() for room in rooms):
+                currentRoom = targetRoom
+                print(crayons.yellow("You have been teleported to the {currentRoom}.", bold=True))
+            else:
+                print("Teleportation failed.")
+        else:
+            # If they typed teleport and hit enter without a location
+            while True:
+                print(crayons.yellow("Please specify a location to teleport or type 'cancel' to abort teleportation:", bold=True))
+                targetRoom = input("> ").capitalize()
+                if targetRoom.lower() == "cancel":
+                    print(crayons.yellow("Teleportation canceled.", bold=True))
+                    break
+                elif targetRoom in rooms:
+                    currentRoom = targetRoom
+                    print(crayons.yellow("You have been teleported to {currentRoom}.", bold=True))
+                    break
+                else:
+                    print(crayons.yellow("The room does not exist. Pleas try again or type 'cancel' to abort.", bold=True))
     #if they type "get" first
-    if move[0] == "get" :
+    if move[0] == "get":
         # make two checks:
         # 1. if the current room contains an item
         # 2. if the item in the room matches the item the player wishes to get
-        if "item" in rooms[currentRoom] and rooms[currentRoom]["item"].lower() == move[1]:
-            #add the item to their inventory
-            inventory.append(rooms[currentRoom]["item"])
-            #display a helpful message
-            print(crayons.green(rooms[currentRoom]["item"], bold=True) + " aquired!")
-            #delete the item key:value pair from the room"s dictionary
-            del rooms[currentRoom]["item"]
+        if "item" in rooms[currentRoom]:
+            room_items = rooms[currentRoom]["item"]
+            # Check if room_items is a list and if item is in the list
+            ## if isinstance(room_items, list) and move[1] in [item.lower() for item in room_items]:
+            if isinstance(room_items, list):
+                requested_item = move[1].lower()
+                normalized_items = [item.lower() for item in room_items]
+                if requested_item in normalized_items:
+                    # Get the original item name from the room_items list
+                    original_item_name = room_items[normalized_items.index(requested_item)]
+                    inventory.append(original_item_name)
+                    print(crayons.green(original_item_name + " acquired!", bold=True))
+                # Find the item's index in the list
+                ## item_index = [item.lower() for item in room_items].index(move[1])
+                # Add the item to their inventory
+                ## inventory.append(room_items[item_index])
+                # Display a helpful message
+                ## print(crayons.green(room_items[item_index], bold=True) + " aquired!")
+                # Remove the item from the room's list
+                ## del room_items[item_index]
+                    room_items.remove(original_item_name)
+                # If list is empty, remove the 'item' atrribute from the room
+                    if not room_items:
+                        del rooms[currentRoom]["item"]
+                else:
+                    print(crayons.red("Can't get " + move[1] + "!", bold=True))
+            else:
+                # If the item is a singel string
+                # Add the item to inventory
+                inventory.append(room_items)
+                # Display a helpful message
+                print(crayons.green(room_items, bold=True) + "acuired!")
+                # Delete the item key:value pair from the room's dictionary
+                if "item" in rooms[currentRoom]:
+                    del rooms[currentRoom]["item"]
         # if there"s no item in the room or the item doesn"t match
         else:
             #tell them they can"t get it
-            print(crayons.red("Can\'t get " + move[1] + "!", bold=True))
+            print(crayons.red("Can't get " + move[1] + "!", bold=True))
 
         ## If a player enters a room with a monster
         ## Define how a player can win
@@ -185,7 +250,7 @@ while True:
         
             if action == "1":
                 # Attack the dragon
-                if "Mage Staff" in inventory and "Spell Scroll: Maelstrom" in inventory:
+                if any("Mage Staff" == item for item in inventory) and any ("Spell Scroll: Maelstrom" == item for item in inventory):
                     dragon_health -= 333 # Dragon loses a third of it"s health
                     print(f"You use your {crayons.green("Mage Staff", bold=True)} and the {crayons.green("Spell Scroll: Maelstrom", bold=True)} against the {crayons.red("Red Dragon", bold=True)}...")
                     time.sleep(1)
@@ -201,7 +266,7 @@ while True:
                         in_combat = False
                         exit()
                     
-                elif "Mage Staff" not in inventory and "Spell Scroll: Maelstrom" not in inventory:
+                elif ["Mage Staff"] not in inventory and ["Spell Scroll: Maelstrom"] not in inventory:
                     print(f"{crayons.yellow("You do not posses the required magical items to defeat the", bold=True)} {crayons.red("Red Dragon", bold=True)}")
                     time.sleep(1)
                     print(crayons.yellow("Turn back!", bold=True))
