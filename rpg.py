@@ -394,7 +394,7 @@ def main():
                         showInstructions()
 
                     elif player_choice == "no":
-                        slow_print(crayons.yellow("Garion's journey to be continued...",bold=True))
+                        slow_print(crayons.green("Garion's journey to be continued...",bold=True))
                         exit()
                     else:
                         slow_print(crayons.red("Invalid option. Exiting the game.", bold=True))
