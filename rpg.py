@@ -2,35 +2,86 @@
 """Garion: The Child of Light - RPG game | Nathan Haley"""
 import crayons
 import time
+from fuzzywuzzy import fuzz
 
 player_health = 100 # Starting health for the player
 dragon_health = 1000 # Starting health for the dragon
 
+def slow_print(text, delay=0.05):
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(delay)
+    print() # To ensure it contiues to print on a new line
+
 def showInstructions():
     """Show the game instructions when called"""
-    #print a main menu and the commands
-    print(crayons.green("""
+    #slow_print a main menu and the commands
+    slow_print(crayons.green("""
     Garion: The Child of Light""", bold=True))
-    print(crayons.yellow("""==================================
+    slow_print(crayons.yellow("""==================================
     Commands:
       go [direction]
       get [item]
       use [item]
       teleport [room name]
+      showspells
     """, bold=True))
 
 def showStatus():
     """determine the current status of the player"""
-    # print the player"s current location
-    print("---------------------------")
-    print("You are in the " + crayons.magenta([currentRoom], bold=True))
-    # print what the player is carrying
-    print(crayons.blue("Inventory:", bold=True), crayons.green(str(inventory), bold=True))
-    # check if there"s an item in the room, if so print it
+    # slow_print the player"s current location
+    slow_print("---------------------------")
+    slow_print("You are in the " + crayons.magenta(str(currentRoom), bold=True))
+    # slow_print what the player is carrying
+    inventory_text = crayons.blue("Inventory:", bold=True) + " " + crayons.green(str(inventory), bold=True)
+    slow_print(inventory_text)
+    ##slow_print(crayons.blue("Inventory:", bold=True), crayons.green(str(inventory), bold=True))
+    # check if there"s an item in the room, if so slow_print it
     if "item" in rooms[currentRoom]:
-      print("There is a " + crayons.green(rooms[currentRoom]["item"], bold=True))
-    print("---------------------------")
+        room_item = rooms[currentRoom]["item"]
+        if isinstance(room_item, list):
+            room_item = ", ".join(map(str, room_item))
+        slow_print("There is a " + crayons.green(str(room_item), bold=True))
+    slow_print("---------------------------")
 
+def fuzzy_match(input_str, valid_options, threshold=70):
+    best_match = None
+    max_score = 0
+    for option in valid_options:
+        score = fuzz.partial_ratio(input_str.lower(), option.lower())
+        if score > max_score:
+            max_score = score
+            best_match = option
+    if max_score >= threshold:
+        return best_match
+    else:
+        return None
+
+def useSpell(spell_name):
+    """Add the spell to the player's spell list and remove spell scrolls from inventory"""
+    spell_name = spell_name.lower() 
+    if spell_name.startswith("spell scroll: ") and spell_name in [item.lower() for item in inventory]:
+        spell_name = spell_name.replace("spell scroll: ", "").title()
+        if spell_name in spells:
+            slow_print(f"You already know the spell {spell_name}!")
+        else:
+            spells.append(spell_name)
+            inventory.remove(f"Spell Scroll: {spell_name}")
+            slow_print(crayons.yellow("You have learned the spell: ", bold=True) + crayons.blue(str(spell_name) + crayons.yellow("!", bold=True), bold=True))
+    else:
+        slow_print(crayons.red("You can't use that item!", bold=True))
+
+def showSpells():
+    """Display the known spells"""
+    if spells:
+        slow_print(crayons.yellow("You know the following spells:", bold=True))
+        for spell in spells:
+            slow_print(crayons.green(spell))
+    else:
+        slow_print(crayons.red("You don't know any spells yet!", bold=True))
+
+# List to store learned spells
+spells = []
 
 # an inventory, which is initially empty
 inventory = []
@@ -65,6 +116,7 @@ rooms = {
                 },
 
             "North Wing" : {
+                  "north" : "Courtyard", # Changed to require a key
                   "south" : "Great Hall", 
                   "east" : "Northeast Intersection",
                   "west" : "Northwest Intersection"
@@ -147,50 +199,61 @@ while True:
     # therefore, "get golden key" becomes ["get", "golden key"]          
     ## move = move.lower().split(" ", 1)
 
+    if move[0] == "use":
+        if len(move) > 1:
+            useSpell(move[1])
+        else:
+            slow_print(crayons.yellow("Please specify which item to use.", bold=True))
+
+    elif move[0] == "showspells":
+        showSpells()
+
     #if they type "go" first
     if move[0] == "go":
         direction = move[1]
         if direction in rooms[currentRoom]:
-            if direction == "east" and currentRoom == "Kitchen" and "Key" not in inventory:
-                print(crayons.red("The door is locked. You need a Key to enter the Courtyard", bold=True))
+            if direction == "north" and currentRoom == "North Wing" and "Key" not in inventory:
+                slow_print(crayons.red("The door is locked. You need Key to enter the Courtyard", bold=True))
+            elif direction == "east" and currentRoom == "Kitchen" and "Key" not in inventory:
+                slow_print(crayons.red("The door is locked. You need a Key to enter the Courtyard", bold=True))
             elif direction == "west" and currentRoom == "Library" and "Key" not in inventory:
-                print(crayons.red("The door is locked. You need a Key to enter the Courtyard", bold=True))
+                slow_print(crayons.red("The door is locked. You need a Key to enter the Courtyard", bold=True))
             else:
                 currentRoom = rooms[currentRoom][direction]
-                print("You go to the " + currentRoom + ".")
+                slow_print("You go to the " + currentRoom + ".")
         else:
-            print(crayons.yellow("You can't go that way", bold=True))
+            slow_print(crayons.yellow("You can't go that way", bold=True))
         # Check that they are allowed wherever they want to go
         ## if move[1] in rooms[currentRoom]:
             # Check if they have the key for Courtyard
             ## if move[1] == "Courtyard" and "Key" not in inventory:
-               ## print(crayons.red("The door to the Courtyard is locked. You need a Key to enter.", bold=True))
+               ## slow_print(crayons.red("The door to the Courtyard is locked. You need a Key to enter.", bold=True))
             ## else:
                ## currentRoom = rooms[currentRoom][move[1]]
         ## else:    
-           ## print(crayons.red("You can't go that way!", bold=True))
+           ## slow_print(crayons.red("You can't go that way!", bold=True))
     if move[0] == "teleport":
         if len(move) > 1:
             targetRoom = " ".join([word.capitalize() for word in move[1].split()])
             if targetRoom.lower() in (room.lower() for room in rooms):
                 currentRoom = targetRoom
-                print(crayons.yellow("You have been teleported to the {currentRoom}.", bold=True))
+                slow_print(f"You have been teleported to the {currentRoom}.")
             else:
-                print("Teleportation failed.")
+                slow_print(crayons.red("Teleportation failed.", bold=True))
         else:
             # If they typed teleport and hit enter without a location
             while True:
-                print(crayons.yellow("Please specify a location to teleport or type 'cancel' to abort teleportation:", bold=True))
+                slow_print(crayons.yellow("Please specify a location to teleport or type 'cancel' to abort teleportation:", bold=True))
                 targetRoom = input("> ").capitalize()
                 if targetRoom.lower() == "cancel":
-                    print(crayons.yellow("Teleportation canceled.", bold=True))
+                    slow_print(crayons.yellow("Teleportation canceled.", bold=True))
                     break
                 elif targetRoom in rooms:
                     currentRoom = targetRoom
-                    print(crayons.yellow("You have been teleported to {currentRoom}.", bold=True))
+                    slow_print(f"You have been teleported to {currentRoom}.")
                     break
                 else:
-                    print(crayons.yellow("The room does not exist. Pleas try again or type 'cancel' to abort.", bold=True))
+                    slow_print(crayons.yellow("The room does not exist. Pleas try again or type 'cancel' to abort.", bold=True))
     #if they type "get" first
     if move[0] == "get":
         # make two checks:
@@ -207,13 +270,13 @@ while True:
                     # Get the original item name from the room_items list
                     original_item_name = room_items[normalized_items.index(requested_item)]
                     inventory.append(original_item_name)
-                    print(crayons.green(original_item_name + " acquired!", bold=True))
+                    slow_print(crayons.green(original_item_name + " acquired!", bold=True))
                 # Find the item's index in the list
                 ## item_index = [item.lower() for item in room_items].index(move[1])
                 # Add the item to their inventory
                 ## inventory.append(room_items[item_index])
                 # Display a helpful message
-                ## print(crayons.green(room_items[item_index], bold=True) + " aquired!")
+                ## slow_print(crayons.green(room_items[item_index], bold=True) + " aquired!")
                 # Remove the item from the room's list
                 ## del room_items[item_index]
                     room_items.remove(original_item_name)
@@ -221,91 +284,91 @@ while True:
                     if not room_items:
                         del rooms[currentRoom]["item"]
                 else:
-                    print(crayons.red("Can't get " + move[1] + "!", bold=True))
+                    slow_print(crayons.red("Can't get" + move[1] + "!", bold=True))
             else:
                 # If the item is a singel string
                 # Add the item to inventory
                 inventory.append(room_items)
                 # Display a helpful message
-                print(crayons.green(room_items, bold=True) + "acuired!")
+                slow_print(crayons.green(room_items, bold=True) + "acuired!")
                 # Delete the item key:value pair from the room's dictionary
                 if "item" in rooms[currentRoom]:
                     del rooms[currentRoom]["item"]
         # if there"s no item in the room or the item doesn"t match
         else:
             #tell them they can"t get it
-            print(crayons.red("Can't get " + move[1] + "!", bold=True))
+            slow_print(crayons.red("Can't get " + move[1] + "!", bold=True))
 
         ## If a player enters a room with a monster
         ## Define how a player can win
 
     if currentRoom == "Courtyard" and "Red Dragon" in rooms[currentRoom]["item"]:
         in_combat = True
-        print(f"{crayons.yellow("You have encountered the", bold=True)} {crayons.red("Red Dragon", bold=True)}!")
+        slow_print(f"{crayons.yellow("You have encountered the", bold=True)} {crayons.red("Red Dragon", bold=True)}{crayons.yellow("!", bold=True)}")
 
         while in_combat:
-            print(f"Dragon Health {dragon_health}, Garion\"s Health {player_health}")
-            print(f"Do you want to (1) {crayons.red("Attack", bold=True)} or (2) use a {crayons.green("Health Potion?", bold=True)}")
+            slow_print(f"Dragon Health {dragon_health}, Garion\"s Health {player_health}")
+            slow_print(f"Do you want to (1) {crayons.red("Attack", bold=True)} or (2) use a {crayons.green("Health Potion?", bold=True)}")
             action = input("> ").strip()
         
             if action == "1":
                 # Attack the dragon
                 if any("Mage Staff" == item for item in inventory) and any ("Spell Scroll: Maelstrom" == item for item in inventory):
                     dragon_health -= 333 # Dragon loses a third of it"s health
-                    print(f"You use your {crayons.green("Mage Staff", bold=True)} and the {crayons.green("Spell Scroll: Maelstrom", bold=True)} against the {crayons.red("Red Dragon", bold=True)}...")
+                    slow_print(f"You use your {crayons.green("Mage Staff", bold=True)} and the {crayons.green("Spell Scroll: Maelstrom", bold=True)} against the {crayons.red("Red Dragon", bold=True)}...")
                     time.sleep(1)
-                    print("Causing significant damage!")
+                    slow_print("Causing significant damage!")
                     time.sleep(1)
                     if dragon_health <= 0:
-                        print(f"{crayons.yellow("The", bold=True)} {crayons.red("Red Dragon", bold=True)} {crayons.yellow("has been defeated!", bold=True)}")
+                        slow_print(f"{crayons.yellow("The", bold=True)} {crayons.red("Red Dragon", bold=True)} {crayons.yellow("has been defeated!", bold=True)}")
                         time.sleep(1)
-                        print(crayons.blue("Peace and balance have finally been restored in the Kingdom...", bold=True))
+                        slow_print(crayons.blue("Peace and balance have finally been restored in the Kingdom...", bold=True))
                         time.sleep(1)
-                        print(crayons.blue("Garion's tale to be continued...", bold=True))
+                        slow_print(crayons.blue("Garion's tale to be continued...", bold=True))
                         del rooms[currentRoom]["item"]
                         in_combat = False
                         exit()
                     
                 elif ["Mage Staff"] not in inventory and ["Spell Scroll: Maelstrom"] not in inventory:
-                    print(f"{crayons.yellow("You do not posses the required magical items to defeat the", bold=True)} {crayons.red("Red Dragon", bold=True)}")
+                    slow_print(f"{crayons.yellow("You do not posses the required magical items to defeat the", bold=True)} {crayons.red("Red Dragon", bold=True)}{crayons.yellow("!", bold=True)}")
                     time.sleep(1)
-                    print(crayons.yellow("Turn back!", bold=True))
+                    slow_print(crayons.yellow("Turn back!", bold=True))
                     time.sleep(1)
                     in_combat = False
                     continue
 
                 # Dragon attacks back
                 player_health -= 50
-                print(f"The {crayons.red("Red Dragon", bold=True)} retaliates, hurling a {crayons.red("Fire Ball", bold=True)} causing severe damage to you!")
+                slow_print(f"The {crayons.red("Red Dragon", bold=True)} retaliates, hurling a {crayons.red("Fire Ball", bold=True)} causing severe damage to you!")
                 if player_health <= 0:
-                    print(f"The {crayons.red("Red Dragon", bold=True)} engulfs you in fire!")
+                    slow_print(f"The {crayons.red("Red Dragon", bold=True)} engulfs you in fire!")
                     time.sleep(1)
-                    print(crayons.yellow("You have been defeated...", bold=True))
+                    slow_print(crayons.yellow("You have been defeated...", bold=True))
                     time.sleep(1)
-                    print(crayons.red("Game Over!", bold=True))
+                    slow_print(crayons.red("Game Over!", bold=True))
                     exit()
 
             elif action == "2":
                 if "Health Potion x3" in inventory:
                     player_health += 50 # Each potion restores 50 health
-                    print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring your health.")
+                    slow_print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring your health.")
                     inventory.append("Health Potion x2")
                     inventory.remove("Health Potion x3")
                 elif "Health Potion x2" in inventory:
                     player_health += 50
-                    print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring your health.")
+                    slow_print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring your health.")
                     inventory.append("Health Potion x1")
                     inventory.remove("Health Potion x2")
                 elif "Health Potion x1" in inventory:
                     player_health += 50
-                    print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring you health.")
+                    slow_print(f"You quickly consume a {crayons.green("Health Potion", bold=True)}, restoring you health.")
                     inventory.remove("Health Potion x1")
                 elif "Health Potion x3" not in inventory or "Health Potion x2" not in inventory or "Health Potion x1" not in inventory:
-                    print(f"{crayons.yellow("You don't have any", bold=True)} {crayons.green("Health Potions", bold=True)} {crayons.yellow("left!", bold=True)}")
+                    slow_print(f"{crayons.yellow("You don't have any", bold=True)} {crayons.green("Health Potions", bold=True)} {crayons.yellow("left!", bold=True)}")
                     time.sleep(1)
                     
                     
 
         # This check prevents the loop from immediatly prompting again without showing the outcome of the action
         if in_combat:
-            print(f"{crayons.red("Red Dragon's")} health is now {dragon_health}. Your health is now {player_health}")
+            slow_print(f"{crayons.red("Red Dragon's")} health is now {dragon_health}. Your health is now {player_health}")
