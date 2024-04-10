@@ -30,7 +30,7 @@ def showInstructions():
     Commands:
       go [direction]
       use [item]
-      showspells
+      list spells
     """, bold=True))
 
 def initializeRooms():
@@ -138,9 +138,9 @@ def getItem(itemName, quantity=1):
 
     # Inform the player of the pickup.
     if quantity > 1:
-        message = f"You picked up {quantity} of {itemName}"
+        message = f"You picked up {quantity} of the {itemName}'s"
     else:
-        message = f"You picked up {itemName}"
+        message = f"You picked up the {itemName}"
     slow_print(crayons.yellow(message))
 
 def showStatus():
@@ -228,7 +228,7 @@ def useSpell(spell_name):
                 del inventory[spell_scroll_key]
             slow_print(crayons.cyan("You have learned the spell: ", bold=True) + crayons.blue(clean_spell_name + crayons.cyan("!", bold=True)))
         else:
-            slow_print(crayons.red("You have already learned: ", bold=True) + crayons.blue(str(spell_name) + crayons.cyan("!", bold=True)))
+            slow_print(crayons.red("You have already learned the spell: ", bold=True) + crayons.blue(str(spell_name) + crayons.cyan("!", bold=True)))
     else:
         slow_print(crayons.red("You don't have that Spell Scroll!", bold=True))
 
@@ -458,7 +458,7 @@ def main():
 ##            else:
 ##                slow_print(crayons.yellow("Please specify which item to use.", bold=True))
 
-            elif command == "showspells":
+            elif command == "list" and argument == "spells":
                 showSpells()
 
 ##        if move[0] == "go" and len(move) > 1:
