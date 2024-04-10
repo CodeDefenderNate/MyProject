@@ -339,39 +339,6 @@ def fightDragon():
                 
         if dragon_health <= 0:
             dragon_defeated = True
-##            slow_print(crayons.cyan("The ") + crayons.red("Red Dragon ") + crayons.cyan("has been defeated!\n") + crayons.green("Peace has been restored to the Kingdom!", bold=True))
-##            del rooms[currentRoom]["item"]
-##            player_choice = input(crayons.cyan("Would you like to start a new game?") + crayons.yellow(" (yes/no): ", bold=True)).strip().lower()
-##            checkGameOver(True) # Victory
-##        elif player_health <= 0:
-##             slow_print(crayons.red("You have been defeated by the Red Dragon...\n GAME OVER!", bold=True))
-##            checkGameOver(False)
-##            break
-##            if player_choice == "yes":
-##                resetGame()
-
-##            elif player_choice == "no":
-##                slow_print(crayons.green("Garion's journey to be continued...",bold=True))
-##                exit()
-##            else:
-##                slow_print(crayons.red("Invalid option. Exiting the game.", bold=True))
-##                exit()
-
-##        if player_health <= 0:
-##            slow_print(crayons.red("You have been defeated by the Red Dragon...\n GAME OVER!", bold=True))                    
-                # Ask the player if they want to start a new game or exit
-##            player_choice = input(crayons.cyan("Would you like to start a new game?") + crayons.yellow(" (yes/no): ", bold=True)).strip().lower()
-
-
-##            if player_choice == "yes":
-##                resetGame()
-
-##            elif player_choice == "no":
-##                slow_print(crayons.green("Garion's journey to be continued...",bold=True))
-##                exit()
-##            else:
-##                slow_print(crayons.red("Invalid option. Exiting the game.", bold=True))
-##                exit()
 
 def checkGameOver(victory):
     global currentRoom, rooms, player_health, dragon_health, inventory, spells, dragon_defeated  # Declare globals if they're manipulated
@@ -380,19 +347,13 @@ def checkGameOver(victory):
         slow_print(crayons.cyan("The ") + crayons.red("Red Dragon ") + crayons.cyan("has been defeated!\n") + crayons.green("Peace has been restored to the Kingdom!", bold=True))
     else:
         slow_print(crayons.red("You have been defeated..."))
-##    slow_print(message))
-##    message = crayons.cyan("The ") + crayons.red("Red Dragon ") + crayons.cyan("has been defeated!\n") + crayons.green("Peace has been restored to the Kingdom!", bold=True)
-##    slow_print(message)
+
     choice = input("Star a New Game? (yes/no): ").lower()
-##    player_choice = input("Game Over. Start a new game? (yes/no): ").lower()
+
     if choice == "yes":
         return True
     else:
         return False
-##    else:
-##        slow_print(crayons.green("Garion's journey to be continued...",bold=True))
-##        exit()
-
 
 def resetGame():
     global player_health, dragon_health, inventory, spells, currentRoom, rooms
@@ -401,12 +362,9 @@ def resetGame():
     inventory = {}
     spells = []
     currentRoom = "Great Hall"
-##    initializeGame()
-    initializeRooms()
-##    slow_print(crayons.cyan("A new journey begins...", bold=True))
-    showInstructions()
 
-    # Reset the game world to its initial state
+    initializeRooms()
+    showInstructions()
 
 def initializeGame():
     global player_health, dragon_health, inventory, spells, currentRoom, rooms, dragon_defeated
@@ -416,10 +374,8 @@ def initializeGame():
     spells = []
     currentRoom = "Great Hall"
     initializeRooms()  # This will set up the rooms dictionary.
-##    slow_print(crayons.cyan("A new journey begins...", bold=True))
     showInstructions()
 
-# start the player in the Hall
 currentRoom = "Great Hall"
 previousRoom = None
 
@@ -430,9 +386,6 @@ def main():
     while game_running:
         initializeGame()
         dragon_defeated = False
-##teleport southwest guard tower
-##        showInstructions()
-
 
 # breaking this while loop means the game is over
         while not dragon_defeated and player_health > 0:
@@ -450,18 +403,12 @@ def main():
     # otherwise input will keep asking
 
             command, argument = move[0], (move[1] if len(move) > 1 else "")
-##        if move[0] == "use":
             if command == "use":
                 useSpell(argument)
-##            if len(move) > 1:
-##                useSpell(move[1])
-##            else:
-##                slow_print(crayons.yellow("Please specify which item to use.", bold=True))
 
             elif command == "list" and argument == "spells":
                 showSpells()
 
-##        if move[0] == "go" and len(move) > 1:
             elif command == "go":
              handleMovement(argument)
 
@@ -473,9 +420,6 @@ def main():
 
             elif command == "heal potion":
                 useHealthPotion()
-
-##            if command == "gameover":
-##                checkGameOver(False)
 
             if player_health <= 0:
                 game_running = checkGameOver(False)
